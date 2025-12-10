@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Express} from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import urlRoutes from '@route';
@@ -9,7 +9,7 @@ import {
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } from '@constant';
 
-const app = express();
+const app: Express = express();
 const PORT = process.env.PORT || DEFAULT_PORT;
 
 app.use(cors());
@@ -62,12 +62,16 @@ app.use(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(
-    `📖 API Documentation available at http://localhost:${PORT}/api-docs`
-  );
-  console.log(
-    `🏥 Health check available at http://localhost:${PORT}/api/health`
-  );
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(
+      `📖 API Documentation available at http://localhost:${PORT}/api-docs`
+    );
+    console.log(
+      `🏥 Health check available at http://localhost:${PORT}/api/health`
+    );
+  });
+}
+
+export default app;
