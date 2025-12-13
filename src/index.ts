@@ -1,15 +1,17 @@
-import express from 'express';
+import express, {Express} from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import urlRoutes from '@route';
+import healthRoutes from '@/routes/healthRoutes';
 import { specs } from '@config';
 import {
   DEFAULT_PORT,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  TEST_ENV,
 } from '@constant';
 
-const app = express();
+const app: Express = express();
 const PORT = process.env.PORT || DEFAULT_PORT;
 
 app.use(cors());
@@ -26,6 +28,7 @@ app.use(
 );
 
 app.use('/api', urlRoutes);
+app.use('/api', healthRoutes);
 
 app.get('/', (req, res) => {
   res.json({
@@ -62,12 +65,16 @@ app.use(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(
-    `📖 API Documentation available at http://localhost:${PORT}/api-docs`
-  );
-  console.log(
-    `🏥 Health check available at http://localhost:${PORT}/api/health`
-  );
-});
+if (process.env.NODE_ENV !== TEST_ENV) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(
+      `📖 API Documentation available at http://localhost:${PORT}/api-docs`
+    );
+    console.log(
+      `🏥 Health check available at http://localhost:${PORT}/api/health`
+    );
+  });
+}
+
+export default app;

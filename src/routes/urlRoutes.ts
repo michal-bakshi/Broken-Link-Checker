@@ -2,8 +2,7 @@ import { Router } from 'express';
 import {
   checkSingleUrl,
   checkMultipleUrlsController,
-  healthCheck,
-} from '@controller';
+} from '@/controllers/url/urlController';
 
 const router: Router = Router();
 
@@ -111,22 +110,5 @@ router.post('/check-url', checkSingleUrl);
  *         description: Internal server error
  */
 router.post('/check-urls', checkMultipleUrlsController);
-
-/**
- * @swagger
- * /api/health:
- *   get:
- *     summary: Health check endpoint
- *     description: Check if the API is running and healthy
- *     tags: [Health]
- *     responses:
- *       200:
- *         description: API is healthy
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/HealthResponse'
- */
-router.get('/health', healthCheck);
 
 export default router;
