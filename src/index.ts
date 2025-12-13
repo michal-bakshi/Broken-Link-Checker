@@ -2,6 +2,7 @@ import express, {Express} from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import urlRoutes from '@route';
+import healthRoutes from '@/routes/healthRoutes';
 import { specs } from '@config';
 import {
   DEFAULT_PORT,
@@ -27,6 +28,7 @@ app.use(
 );
 
 app.use('/api', urlRoutes);
+app.use('/api', healthRoutes);
 
 app.get('/', (req, res) => {
   res.json({
