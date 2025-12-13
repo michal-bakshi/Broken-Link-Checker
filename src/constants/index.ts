@@ -20,3 +20,5 @@ export const INTERNAL_SERVER_ERROR = 'Internal server error';
 export const HEALTH_CHECK_MESSAGE = 'URL Checker API is running';
 export const URL_CHECK_COMPLETED = (working: number, broken: number) =>
     `URL check completed - ${working} working, ${broken} broken`;
+
+export const TEST_ENV= 'test';

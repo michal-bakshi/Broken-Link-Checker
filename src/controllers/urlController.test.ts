@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import app from '../index'; 
+import { UrlCheckResult } from '@/services/urlService';
 
 describe('URL Controller Endpoints', () => {
 
@@ -45,14 +46,31 @@ describe('URL Controller Endpoints', () => {
     describe('POST /api/check-urls', () => {
         
         it('should handle multiple URLs successfully', async () => {
-            const urls = ['https://google.com', 'https://github.com'];
+            const validUrl = 'https://google.com';
+            const invalidUrl = 'not_real_url.com';
+            const urls = [validUrl, invalidUrl];  
+                    
             const res = await request(app)
                 .post('/api/check-urls')
                 .send({ urls });
 
+            const results: UrlCheckResult[] = res.body.data.results;
+
             expect(res.status).toBe(200);
-            expect(Array.isArray(res.body.data.results)).toBe(true);
-            expect(res.body.data.summary.total).toBe(2);
+            expect(Array.isArray(results)).toBe(true);
+            expect(res.body.data.summary.total).toBe(urls.length);
+
+            results.forEach(resultItem => {
+                if (resultItem.url === validUrl) {
+                    expect(resultItem.isBroken).toBe(false);
+                    expect(resultItem.statusCode).toBe(200); 
+                } 
+                else if (resultItem.url === invalidUrl) {
+                    expect(resultItem.isBroken).toBe(true);
+                    expect(resultItem.statusCode).toBeUndefined(); 
+                    expect(resultItem.error).toBeDefined();
+                }
+            });
         });
 
         it('should return 400 for too many URLs (>10)', async () => {

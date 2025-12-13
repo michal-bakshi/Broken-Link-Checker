@@ -7,6 +7,7 @@ import {
   DEFAULT_PORT,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  TEST_ENV,
 } from '@constant';
 
 const app: Express = express();
@@ -62,7 +63,7 @@ app.use(
   }
 );
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== TEST_ENV) {
   app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
     console.log(
