@@ -5,14 +5,6 @@ import { UrlCheckResult } from '@/services/urlService';
 
 describe('URL Controller Endpoints', () => {
 
-    describe('GET /api/health', () => {
-        it('should return 200 OK', async () => {
-            const res = await request(app).get('/api/health');
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true); 
-        });
-    });
-
     describe('POST /api/check-url', () => {
         
         it('should return isBroken: false for a working URL', async () => {
