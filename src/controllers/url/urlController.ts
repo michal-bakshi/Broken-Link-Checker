@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { checkUrl, checkMultipleUrls, UrlCheckResult } from '@/services/urlService';
-import { writeAndUpdate } from '@/services/fileService';
+import { writeToFile } from '@/services/urlRecordsService';
 import {
     MAX_URLS_PER_REQUEST,
     HTTP_STATUS_BAD_REQUEST,
@@ -33,7 +33,7 @@ export const checkSingleUrl = async (
 
     const result: UrlCheckResult = await checkUrl(url);
 
-    writeAndUpdate(result);
+    writeToFile(result);
 
     res.status(200).json({
       success: true,
@@ -84,7 +84,7 @@ export const checkMultipleUrlsController = async (
 
     const results: UrlCheckResult[] = await checkMultipleUrls(urls);
 
-    writeAndUpdate(results);
+    writeToFile(results);
 
     const summary = {
       total: results.length,

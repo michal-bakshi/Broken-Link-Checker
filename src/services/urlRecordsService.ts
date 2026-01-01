@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { UrlCheckResult } from '@/services/urlService';
+import { appendToJsonArrayFile } from '@/services/jsonFileService';
 
 export interface UrlCheckRecord {
   result: UrlCheckResult;
@@ -8,7 +9,6 @@ export interface UrlCheckRecord {
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
-
 
 const getTodayDateComponents = (): {
   year: number;
@@ -35,46 +35,16 @@ const getTodayFilePath = (): string => {
   return path.join(yearMonthPath, `${dateString}.json`);
 };
 
-const ensureDataDirectoryExists = async (): Promise<void> => {
+//TODO: place this function 
+export const ensureDataDirectoryExists = async (): Promise<void> => {
   const yearMonthPath = getYearMonthPath();
-  try {
-    await fs.access(yearMonthPath);
-  } catch {
-    await fs.mkdir(yearMonthPath, { recursive: true });
-  }
+  await fs.mkdir(yearMonthPath, { recursive: true });
 };
 
-const fileExists = async (filePath: string): Promise<boolean> => {
-  try {
-    await fs.access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const readTodayFile = async (filePath: string): Promise<UrlCheckRecord[]> => {
-  try {
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(fileContent);
-  } catch (error) {
-    return [];
-  }
-};
-
-const writeTodayFile = async (
-  filePath: string,
-  records: UrlCheckRecord[]
-): Promise<void> => {
-  await fs.writeFile(filePath, JSON.stringify(records, null, 2), 'utf-8');
-};
-
-export const writeAndUpdate = async (
+export const writeToFile = async (
   results: UrlCheckResult | UrlCheckResult[]
 ): Promise<void> => {
   try {
-    await ensureDataDirectoryExists();
-
     const filePath = getTodayFilePath();
     const resultsArray = Array.isArray(results) ? results : [results];
     const checkedAt = new Date().toISOString();
@@ -84,13 +54,7 @@ export const writeAndUpdate = async (
       checkedAt,
     }));
 
-    if (await fileExists(filePath)) {
-      const existingRecords = await readTodayFile(filePath);
-      const updatedRecords = [...existingRecords, ...newRecords];
-      await writeTodayFile(filePath, updatedRecords);
-    } else {
-      await writeTodayFile(filePath, newRecords);
-    }
+    await appendToJsonArrayFile<UrlCheckRecord>(filePath, newRecords);
   } catch (error) {
     console.error('Error saving URL check results to file:', error);
   }
