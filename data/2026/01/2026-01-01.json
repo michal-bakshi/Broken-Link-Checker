@@ -1,0 +1,38 @@
+[
+  {
+    "result": {
+      "url": "https://open.spotify.com/",
+      "isBroken": false,
+      "statusCode": 200,
+      "responseTime": 380
+    },
+    "checkedAt": "2026-01-01T12:33:19.496Z"
+  },
+  {
+    "result": {
+      "url": "https://google.com",
+      "isBroken": false,
+      "statusCode": 200,
+      "responseTime": 845
+    },
+    "checkedAt": "2026-01-01T12:33:19.496Z"
+  },
+  {
+    "result": {
+      "url": "https://open.spotify.com/",
+      "isBroken": false,
+      "statusCode": 200,
+      "responseTime": 317
+    },
+    "checkedAt": "2026-01-01T12:33:27.516Z"
+  },
+  {
+    "result": {
+      "url": "https://google.com",
+      "isBroken": false,
+      "statusCode": 200,
+      "responseTime": 1186
+    },
+    "checkedAt": "2026-01-01T12:33:27.516Z"
+  }
+]

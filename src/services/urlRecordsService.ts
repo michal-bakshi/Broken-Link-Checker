@@ -1,14 +1,18 @@
-import fs from 'fs/promises';
 import path from 'path';
 import { UrlCheckResult } from '@/services/urlService';
 import { appendToJsonArrayFile } from '@/services/jsonFileService';
 
+const DATA_DIRECTORY_NAME = 'data';
+const MONTH_OFFSET = 1;
+const PAD_LENGTH = 2;
+const PAD_CHARACTER = '0';
+const ERROR_MESSAGE_SAVE_RESULTS = 'Error saving URL check results to file:';
+const DATA_DIR = path.join(process.cwd(), DATA_DIRECTORY_NAME);
+
 export interface UrlCheckRecord {
   result: UrlCheckResult;
-  checkedAt: string;
+  lastCheckedAtIso: string;
 }
-
-const DATA_DIR = path.join(process.cwd(), 'data');
 
 const getTodayDateComponents = (): {
   year: number;
@@ -18,13 +22,13 @@ const getTodayDateComponents = (): {
 } => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + MONTH_OFFSET).padStart(PAD_LENGTH, PAD_CHARACTER);
+  const day = String(today.getDate()).padStart(PAD_LENGTH, PAD_CHARACTER);
   const dateString = `${year}-${month}-${day}`;
   return { year, month, day, dateString };
 };
 
-const getYearMonthPath = (): string => {
+export const getYearMonthPath = (): string => {
   const { year, month } = getTodayDateComponents();
   return path.join(DATA_DIR, String(year), month);
 };
@@ -35,28 +39,27 @@ const getTodayFilePath = (): string => {
   return path.join(yearMonthPath, `${dateString}.json`);
 };
 
-//TODO: place this function 
-export const ensureDataDirectoryExists = async (): Promise<void> => {
-  const yearMonthPath = getYearMonthPath();
-  await fs.mkdir(yearMonthPath, { recursive: true });
-};
+export const appendResult = async (
+  result: UrlCheckResult
+): Promise<void> => {
+  return appendResults([result]);
+}
 
-export const writeToFile = async (
-  results: UrlCheckResult | UrlCheckResult[]
+export const appendResults = async (
+  results: UrlCheckResult[]
 ): Promise<void> => {
   try {
     const filePath = getTodayFilePath();
-    const resultsArray = Array.isArray(results) ? results : [results];
-    const checkedAt = new Date().toISOString();
+    const lastCheckedAtIso = new Date().toISOString();
 
-    const newRecords: UrlCheckRecord[] = resultsArray.map((result) => ({
+    const newRecords: UrlCheckRecord[] = results.map((result) => ({
       result,
-      checkedAt,
+      lastCheckedAtIso,
     }));
 
     await appendToJsonArrayFile<UrlCheckRecord>(filePath, newRecords);
   } catch (error) {
-    console.error('Error saving URL check results to file:', error);
+    console.error(ERROR_MESSAGE_SAVE_RESULTS, error);
   }
 };
 

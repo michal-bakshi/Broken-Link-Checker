@@ -9,7 +9,6 @@
 - [Development](#development)
 - [Docker](#docker)
 - [API Documentation](#api-documentation)
-- [URL Check History](#url-check-history)
 - [Production](#production)
 - [API Endpoints](#api-endpoints)
     - [Health Check](#1-health-check)
@@ -44,7 +43,6 @@ A TypeScript Express application that checks if URLs are broken or not. Built wi
 - ✅ Check multiple URLs at once (up to 10 URLs per request)
 - ✅ Response time tracking
 - ✅ Detailed error reporting
-- ✅ URL check history - Stores all URL check results
 - ✅ TypeScript with ES modules
 - ✅ CORS enabled
 - ✅ Health check endpoint
@@ -80,12 +78,6 @@ The API documentation is available at:
 
 - **Swagger UI**: `http://localhost:3000/api-docs`
 - **OpenAPI JSON**: `http://localhost:3000/api-docs/swagger.json`
-
-### URL Check History
-
-The application automatically saves all URL check results to local JSON files for future statistics and analysis.
-
-Results are stored under the `data/` directory, organized by year and month, and include a `checkedAt` timestamp for each check.
 
 ## Production
 
@@ -264,14 +256,9 @@ src/
 ├── routes/
 │   └── urlRoutes.ts      # URL checking routes with Swagger docs
 ├── services/
-│   ├── urlService.ts     # URL checking service logic
-│   └── fileService.ts    # File storage service for check history
+│   └── urlService.ts     # URL checking service logic
 └── constants/
     └── index.ts          # Application constants
-data/                     # URL check history (auto-generated)
-└── YYYY/
-    └── MM/
-        └── YYYY-MM-DD.json
 ```
 
 ## Architecture
@@ -281,8 +268,6 @@ The application follows the MVC (Model-View-Controller) pattern:
 - **Controllers** (`src/controllers/`): Handle HTTP requests and responses, contain business logic
 - **Routes** (`src/routes/`): Define API endpoints and connect them to controllers
 - **Services** (`src/services/`): Contain core business logic and data processing
-  - `urlService.ts`: Performs URL validation and HTTP checks
-  - `fileService.ts`: Manages persistent storage of check results
 - **Models**: Represented by TypeScript interfaces and data structures
 - **Config** (`src/config/`): Configuration files like Swagger documentation
 

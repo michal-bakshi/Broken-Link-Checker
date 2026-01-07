@@ -79,9 +79,6 @@ jspm_packages/
 tmp/
 temp/
 
-# Data directory for URL check results
-data/
-
 # Editor directories and files
 .vscode/
 .idea/
