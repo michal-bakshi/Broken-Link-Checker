@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import { getYearMonthPath } from '@/services/urlRecordsService';
 
 export interface FileSystemError extends Error {
