@@ -1,4 +1,4 @@
-import { stat, open } from 'fs/promises';
+import { stat, open } from 'fs';
 import { 
   ensureDataDirectoryExists, 
   FileSystemError 
