@@ -77,7 +77,9 @@ export const checkMultipleUrlsController = async (
       return;
     }
 
+    const startTime = Date.now();
     const results: UrlCheckResult[] = await checkMultipleUrls(urls);
+    const scanDuration = Date.now() - startTime;
 
     appendResults(results);
 
@@ -85,6 +87,7 @@ export const checkMultipleUrlsController = async (
       total: results.length,
       broken: results.filter((r) => r.isBroken).length,
       working: results.filter((r) => !r.isBroken).length,
+      scanDuration,
     };
 
     res.status(200).json({
