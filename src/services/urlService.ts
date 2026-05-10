@@ -143,9 +143,9 @@ export const checkUrl = async (url: string): Promise<UrlCheckResult> => {
       return { ...result, attempts: attempt };
     }
 
+    const status = result.statusCode;
     const isNonRetryable =
-      result.statusCode &&
-      result.statusCode < HTTP_STATUS_INTERNAL_SERVER_ERROR;
+      typeof status === "number" && status < HTTP_STATUS_INTERNAL_SERVER_ERROR;
 
     if (isNonRetryable || attempt === MAX_RETRY_ATTEMPTS) {
       return { ...result, attempts: attempt };
