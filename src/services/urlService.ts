@@ -163,6 +163,7 @@ export const checkUrl = async (url: string): Promise<UrlCheckResult> => {
   };
 };
 
+// TODO: Re-test this flow once repository link scanning is implemented.
 export const checkMultipleUrls = async (
   urls: string[],
 ): Promise<UrlCheckResult[]> => {
