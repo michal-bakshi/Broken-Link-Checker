@@ -17,7 +17,9 @@ const SOFT_404_HTML =
 
 describe("checkUrl retry logic", () => {
   it("succeeds on the first attempt and sets attempts to 1", async () => {
-    server.use(http.get(MOCK_URL, () => HttpResponse.html(OK_HTML, { status: 200 })));
+    server.use(
+      http.get(MOCK_URL, () => HttpResponse.html(OK_HTML, { status: 200 })),
+    );
 
     const result = await checkUrl(MOCK_URL);
 
@@ -38,7 +40,7 @@ describe("checkUrl retry logic", () => {
           return HttpResponse.json({}, { status: 500 });
         }
         return HttpResponse.html(OK_HTML, { status: 200 });
-      })
+      }),
     );
 
     const result = await checkUrl(MOCK_URL);
@@ -51,7 +53,9 @@ describe("checkUrl retry logic", () => {
   });
 
   it("returns broken after exhausting all retry attempts on a persistent 5xx error", async () => {
-    server.use(http.get(MOCK_URL, () => HttpResponse.json({}, { status: 500 })));
+    server.use(
+      http.get(MOCK_URL, () => HttpResponse.json({}, { status: 500 })),
+    );
 
     const result = await checkUrl(MOCK_URL);
 
@@ -63,7 +67,9 @@ describe("checkUrl retry logic", () => {
   });
 
   it("does not retry a 4xx error and returns broken with attempts: 1", async () => {
-    server.use(http.get(MOCK_URL, () => HttpResponse.json({}, { status: 404 })));
+    server.use(
+      http.get(MOCK_URL, () => HttpResponse.json({}, { status: 404 })),
+    );
 
     const result = await checkUrl(MOCK_URL);
 
@@ -76,7 +82,9 @@ describe("checkUrl retry logic", () => {
 
   it("does not retry a soft-404 and returns broken with attempts: 1", async () => {
     server.use(
-      http.get(MOCK_URL, () => HttpResponse.html(SOFT_404_HTML, { status: 200 }))
+      http.get(MOCK_URL, () =>
+        HttpResponse.html(SOFT_404_HTML, { status: 200 }),
+      ),
     );
 
     const result = await checkUrl(MOCK_URL);
