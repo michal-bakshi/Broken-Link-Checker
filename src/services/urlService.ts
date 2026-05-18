@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { setTimeout as delay } from "timers/promises";
 import {
   FAILED_REQUEST,
   HTTP_TIMEOUT,
@@ -9,9 +10,12 @@ import {
   URL_WORKING,
   URL_BROKEN,
   LOCALHOST_URLS,
+  MAX_RETRY_ATTEMPTS,
+  RETRY_DELAY_MS,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  HTTP_STATUS_BAD_REQUEST,
 } from "@constant";
 import { HTML_TITLE_REGEX } from "@/utils/regexUtils";
-
 export interface UrlCheckResult {
   url: string;
   isBroken: boolean;
@@ -19,6 +23,7 @@ export interface UrlCheckResult {
   error?: string;
   responseTime?: number;
   message?: string;
+  attempts?: number;
 }
 
 const isValidUrl = (url: string): boolean => {
@@ -57,30 +62,14 @@ const isSoft404 = (response: AxiosResponse): boolean => {
   );
 };
 
-export const checkUrl = async (url: string): Promise<UrlCheckResult> => {
-  const startTime = Date.now();
-
+const performHttpCheck = async (
+  url: string,
+  startTime: number,
+): Promise<UrlCheckResult> => {
   try {
-    if (!isValidUrl(url)) {
-      return {
-        url,
-        isBroken: true,
-        error: INVALID_URL_FORMAT,
-        message: URL_BROKEN,
-      };
-    }
-
-    if (isLocalhostUrl(url)) {
-      return {
-        url,
-        isBroken: false,
-        message: LOCALHOST_URL_MESSAGE,
-      };
-    }
-
     const response: AxiosResponse = await axios.get(url, {
       timeout: HTTP_TIMEOUT,
-      validateStatus: (status) => status < 400,
+      validateStatus: (status) => status < HTTP_STATUS_BAD_REQUEST,
       maxRedirects: MAX_REDIRECTS,
       headers: {
         "User-Agent":
@@ -125,6 +114,56 @@ export const checkUrl = async (url: string): Promise<UrlCheckResult> => {
   }
 };
 
+export const checkUrl = async (url: string): Promise<UrlCheckResult> => {
+  if (!isValidUrl(url)) {
+    return {
+      url,
+      isBroken: true,
+      error: INVALID_URL_FORMAT,
+      message: URL_BROKEN,
+      attempts: 1,
+    };
+  }
+
+  if (isLocalhostUrl(url)) {
+    return {
+      url,
+      isBroken: false,
+      message: LOCALHOST_URL_MESSAGE,
+      attempts: 1,
+    };
+  }
+
+  const startTime = Date.now();
+
+  for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+    const result = await performHttpCheck(url, startTime);
+
+    if (!result.isBroken) {
+      return { ...result, attempts: attempt };
+    }
+
+    const status = result.statusCode;
+    const isNonRetryable =
+      typeof status === "number" && status < HTTP_STATUS_INTERNAL_SERVER_ERROR;
+
+    if (isNonRetryable || attempt === MAX_RETRY_ATTEMPTS) {
+      return { ...result, attempts: attempt };
+    }
+
+    await delay(RETRY_DELAY_MS);
+  }
+
+  return {
+    url,
+    isBroken: true,
+    error: FAILED_REQUEST,
+    message: URL_BROKEN,
+    attempts: MAX_RETRY_ATTEMPTS,
+  };
+};
+
+// TODO: Re-test this flow once repository link scanning is implemented.
 export const checkMultipleUrls = async (
   urls: string[],
 ): Promise<UrlCheckResult[]> => {

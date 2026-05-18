@@ -29,3 +29,6 @@ export const TEST_ENV = "test";
 export const URL_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 export const URL_RATE_LIMIT_MAX_REQUESTS = 30;
 export const RATE_LIMIT_MESSAGE = "Too many requests, please try again later.";
+
+export const MAX_RETRY_ATTEMPTS = 3;
+export const RETRY_DELAY_MS = 1000;
